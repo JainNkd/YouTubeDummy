@@ -18,12 +18,26 @@
     [super viewDidLoad];
     NSString *videoId = @"gHy747iC3Cw";
     
+    [self.playerView removeWebView];
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(windowNowVisible:)
+     name:UIWindowDidBecomeVisibleNotification
+     object:self.view.window
+     ];
+    
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(windowNowHidden:)
+     name:UIWindowDidBecomeHiddenNotification
+     object:self.view.window
+     ];
     
     // For a full list of player parameters, see the documentation for the HTML5 player
     // at: https://developers.google.com/youtube/player_parameters?playerVersion=HTML5
     NSDictionary *playerVars = @{
                                  @"autoplay" : @1,
-                                 @"playsinline" : @1,
+                                 @"playsinline" : @0,
                                  @"showinfo" : @0,
                                  @"rel" : @0,
                                  @"modestbranding" : @1,
@@ -48,6 +62,21 @@
 //    }
 //}
 //
+
+- (void)windowNowVisible:(NSNotification *)notification
+{
+    NSLog(@"Youtube/ Media window appears");
+}
+
+
+- (void)windowNowHidden:(NSNotification *)notification
+{
+    NSLog(@"Youtube/ Media window disappears.");
+    
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+
 -(void)playerViewDidBecomeReady:(YTPlayerView *)playerView
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"Playback started" object:self]; [self.playerView playVideo]; }
@@ -59,12 +88,7 @@
 
 -(void)playerView:(YTPlayerView *)playerView didChangeToState:(YTPlayerState)state
 {
-    NSLog(@"Video Play done...%ld",(long)state);
-    if(state == kYTPlayerStateEnded)
-    {
-        NSLog(@"Video Play done");
-        [self.navigationController popViewControllerAnimated:YES];
-    }
+
 }
 
 - (void)didReceiveMemoryWarning {
